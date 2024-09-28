@@ -1,4 +1,4 @@
--- script para mysql - projeto feito em postgres
+-- script original para mysql - projeto feito em postgres
 
 DROP TABLE IF EXISTS cliente;
 
