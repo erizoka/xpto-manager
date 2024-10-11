@@ -3,6 +3,10 @@ package com.erizoka.xpto.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Service;
 
 import com.erizoka.xpto.data.vo.ClienteVO;
@@ -13,15 +17,47 @@ import com.erizoka.xpto.exception.ResourceNotFoundException;
 import com.erizoka.xpto.mapper.DozerMapper;
 import com.erizoka.xpto.repository.ClienteRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ClienteService {
 
 	private final ClienteRepository repository;
-
-	public ClienteService(ClienteRepository repository) {
-		this.repository = repository;
-	}
+	private JobLauncher jobLauncher;
+	private Job novaContaComEmailJob;
 	
+	public ClienteService(ClienteRepository repository, JobLauncher jobLauncher, Job novaContaComEmailJob) {
+		this.repository = repository;
+		this.jobLauncher = jobLauncher;
+		this.novaContaComEmailJob = novaContaComEmailJob;
+	}
+
+	public void iniciarJobNovaContaComEmail(Cliente cliente){
+		try {
+			
+			JobParameters params = new JobParametersBuilder()
+					.addString("clienteId", cliente.getEmail())
+					.toJobParameters();
+
+			jobLauncher.run(novaContaComEmailJob, params);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Transactional
+	public ClienteVO save(ClienteVO clienteVO) {
+		if (clienteVO == null) throw new RequiredObjectIsNullException();
+		
+		var entity = DozerMapper.parseObject(clienteVO, Cliente.class);
+		var vo = DozerMapper.parseObject(repository.save(entity), ClienteVO.class);
+
+		iniciarJobNovaContaComEmail(entity);
+
+		return vo;
+	}
+
 	public List<ClienteVO> findAll(){
 		List<Cliente> clientes = repository.findAll();
 		List<ClienteVO> voList = new ArrayList<>();
@@ -45,13 +81,6 @@ public class ClienteService {
 		// update para deletar conta vinculada em cascata
 	}
 	
-	public ClienteVO save(ClienteVO clienteVO) {
-		if (clienteVO == null) throw new RequiredObjectIsNullException();
-		
-		var entity = DozerMapper.parseObject(clienteVO, Cliente.class);
-		var vo = DozerMapper.parseObject(repository.save(entity), ClienteVO.class);
-		return vo;
-	}
 	
 	public ClienteVO update(ClienteVO clienteVO) {
 		if (clienteVO == null) throw new RequiredObjectIsNullException();

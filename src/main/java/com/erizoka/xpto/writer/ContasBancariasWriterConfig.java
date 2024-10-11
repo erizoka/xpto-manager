@@ -3,11 +3,13 @@ package com.erizoka.xpto.writer;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemWriter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import com.erizoka.xpto.entity.Conta;
 import com.erizoka.xpto.repository.ContasBancariasRepository;
 
-// Job que criou as contas bancárias com os clientes cadastrados em banco, script na pasta files
+@Configuration
 public class ContasBancariasWriterConfig implements ItemWriter<Conta>{
 	
 	private ContasBancariasRepository repository;
@@ -16,6 +18,7 @@ public class ContasBancariasWriterConfig implements ItemWriter<Conta>{
 		this.repository = repository;
 	}
 	
+	@Bean
 	RepositoryItemWriter<Conta> contasBancariasWriter(){
 		RepositoryItemWriter<Conta> writer = new RepositoryItemWriter<>();
 		writer.setRepository(repository);

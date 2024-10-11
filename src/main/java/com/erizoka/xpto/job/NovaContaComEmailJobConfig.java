@@ -5,19 +5,23 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-//Job que criou as contas bancárias com os clientes cadastrados em banco, script na pasta files
-public class ContasBancariasJobConfig {
+@Configuration
+public class NovaContaComEmailJobConfig {
 
 	private JobRepository jobRepository;
 
-	public ContasBancariasJobConfig(JobRepository jobRepository) {
+	public NovaContaComEmailJobConfig(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
 
-	Job contasBancariasJob(Step contasBancariasStep) {
-		return new JobBuilder("contasBancariasJob", jobRepository)
+	@Bean
+	Job novaContaComEmailJob(Step contasBancariasStep, Step emailBoasVindasStep) {
+		return new JobBuilder("novaContaComEmailJob", jobRepository)
 				.start(contasBancariasStep)
+				.next(emailBoasVindasStep)
 				.incrementer(new RunIdIncrementer())
 				.build();
 	}
