@@ -7,10 +7,13 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.erizoka.xpto.data.vo.ClienteVO;
+import com.erizoka.xpto.data.vo.ContaVO;
 import com.erizoka.xpto.entity.Cliente;
+import com.erizoka.xpto.entity.Conta;
 import com.erizoka.xpto.exception.NullIdException;
 import com.erizoka.xpto.exception.RequiredObjectIsNullException;
 import com.erizoka.xpto.exception.ResourceNotFoundException;
@@ -21,6 +24,9 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ClienteService {
+	
+	@Autowired
+	ContaService contaService;
 
 	private final ClienteRepository repository;
 	private JobLauncher jobLauncher;
@@ -46,7 +52,6 @@ public class ClienteService {
 		}
 	}
 
-	@Transactional
 	public ClienteVO save(ClienteVO clienteVO) {
 		if (clienteVO == null) throw new RequiredObjectIsNullException();
 		
@@ -76,26 +81,30 @@ public class ClienteService {
 		return vo;	
 	}
 	
+	@Transactional
 	public void deleteById(String email) {
 		repository.deleteById(email);
-		// update para deletar conta vinculada em cascata
+		contaService.deleteByClienteId(email);
 	}
 	
-	
+	@Transactional
 	public ClienteVO update(ClienteVO clienteVO) {
 		if (clienteVO == null) throw new RequiredObjectIsNullException();
 		
-		Cliente entity = repository.findById(clienteVO.getEmail())
+		Cliente clienteEntity = repository.findById(clienteVO.getEmail())
 			.orElseThrow(() -> new ResourceNotFoundException("Não há cliente para este email: " + clienteVO.getEmail()));
-			
-		entity.setNome(clienteVO.getNome());
-		entity.setIdade(clienteVO.getIdade());
-		entity.setFaixaSalarial(clienteVO.getFaixaSalarial());
-
-		Cliente updatedEntity = repository.save(entity);
-		ClienteVO updatedVO = DozerMapper.parseObject(updatedEntity, ClienteVO.class);
 		
-		return updatedVO;
-		// update para atualizar conta vinculada em cascata
+		clienteEntity.setNome(clienteVO.getNome());
+		clienteEntity.setIdade(clienteVO.getIdade());
+		clienteEntity.setFaixaSalarial(clienteVO.getFaixaSalarial());
+		repository.save(clienteEntity);
+		
+		Conta contaEntity = DozerMapper.parseObject(contaService.findByClienteId(clienteEntity.getEmail()), Conta.class);
+		contaEntity.setFaixaSalarial(clienteEntity.getFaixaSalarial());
+    	contaEntity.definirTipoELimitePorFaixaSalarial();
+		
+		contaService.update(DozerMapper.parseObject(contaEntity, ContaVO.class));
+		
+		return DozerMapper.parseObject(clienteEntity, ClienteVO.class);
 	}
 }

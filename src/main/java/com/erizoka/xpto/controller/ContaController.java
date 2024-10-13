@@ -50,15 +50,14 @@ public class ContaController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteById(@PathVariable Integer id){
-		service.deleteById(id);
+	public ResponseEntity<?> deleteById(@PathVariable String clienteId){
+		service.deleteByClienteId(clienteId);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PostMapping("/update")
+	@PostMapping()
 	public ResponseEntity<ContaVO> update(@RequestBody ContaVO conta) {
 		service.update(conta);
 		return ResponseEntity.ok().build();
 	}
-	
 }

@@ -3,6 +3,7 @@ package com.erizoka.xpto.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,11 @@ public interface ContasBancariasRepository extends JpaRepository<Conta, Integer>
 
 	@Query("SELECT c FROM Conta c WHERE c.tipo = :tipo")
 	public List<Conta> findByTipoConta(@Param("tipo") TipoConta tipo);
+	
+	@Query("SELECT c FROM Conta c WHERE c.clienteId = :clienteId")
+	public Conta findByClienteId(@Param("clienteId") String clienteId);
+	
+	@Modifying
+	@Query("DELETE FROM Conta c WHERE c.clienteId = :clienteId")
+	public void deleteByClienteId(@Param("clienteId") String clienteId);
 }

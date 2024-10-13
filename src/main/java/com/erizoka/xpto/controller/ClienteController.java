@@ -42,12 +42,12 @@ public class ClienteController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@PostMapping
+	@PostMapping()
 	public ClienteVO create(@RequestBody ClienteVO cliente){
 		return service.save(cliente);
 	}
 
-	@PutMapping("update")
+	@PutMapping()
 	public ClienteVO update(@RequestBody ClienteVO cliente) {
 		return service.update(cliente);
 	}

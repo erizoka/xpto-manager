@@ -25,7 +25,7 @@ public class EmailBoasVindasReader {
 		return new JdbcCursorItemReaderBuilder<NovaContaCliente>()
 				.name("jdbcCursosReader")
 				.dataSource(datasource)
-				.sql("SELECT * FROM cliente c join conta c2 on (c.email = c2.cliente_id)")
+				.sql("SELECT * FROM cliente c join conta c2 on (c.email = c2.cliente_id) WHERE c.email = ?")
 				.rowMapper(rowMapper())
 				.build();
 	}

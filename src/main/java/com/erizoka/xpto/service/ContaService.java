@@ -41,12 +41,22 @@ public class ContaService {
 		return conta;	
 	}
 	
+	public ContaVO findByClienteId(String clienteId) {
+		Conta idFound = repository.findByClienteId(clienteId);
+		
+		if (idFound == null) throw new NullPointerException("Nenhuma conta encontrada para o email: " + clienteId);
+		
+		ContaVO conta = DozerMapper.parseObject(idFound, ContaVO.class);
+
+		return conta;
+	}
+	
 	public List<ContaVO> findByTipoConta(TipoConta tipo) {
 		return DozerMapper.parseListObjects(repository.findByTipoConta(tipo), ContaVO.class);
 	}
 	
-	public void deleteById(Integer id) {
-		repository.deleteById(id);
+	public void deleteByClienteId(String clienteId) {
+		repository.deleteByClienteId(clienteId);
 	}
 	
 	public void update(ContaVO contaVO) {
