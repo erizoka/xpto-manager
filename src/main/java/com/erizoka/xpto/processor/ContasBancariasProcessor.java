@@ -9,6 +9,7 @@ import com.erizoka.xpto.entity.Conta;
 @Component
 public class ContasBancariasProcessor implements ItemProcessor<Cliente, Conta>{
 
+	@SuppressWarnings("null")
 	@Override
 	public Conta process(Cliente cliente) throws Exception {
 		

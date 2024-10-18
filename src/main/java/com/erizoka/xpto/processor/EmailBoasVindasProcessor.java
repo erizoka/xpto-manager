@@ -9,7 +9,8 @@ import com.erizoka.xpto.entity.NovaContaCliente;
 @Component
 public class EmailBoasVindasProcessor implements ItemProcessor<NovaContaCliente, SimpleMailMessage>{
 
-    @Override
+    @SuppressWarnings("null")
+	@Override
     public SimpleMailMessage process(NovaContaCliente novaContaCliente) throws Exception {
         SimpleMailMessage email = new SimpleMailMessage();
 		email.setFrom("xpto@no-reply.com");

@@ -7,11 +7,13 @@ import org.springframework.core.io.FileSystemResource;
 
 @Configuration
 public class PropsConfig {
-	
+
 	@Bean
-	PropertySourcesPlaceholderConfigurer config() {
+	static PropertySourcesPlaceholderConfigurer config() {
 		PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
-		configurer.setLocation(new FileSystemResource("C:/temp/data/xpto/application.properties"));
+		FileSystemResource resource = new FileSystemResource("C:/temp/data/xpto/application.properties");
+		configurer.setLocation(resource);
 		return configurer;
+
 	}
 }

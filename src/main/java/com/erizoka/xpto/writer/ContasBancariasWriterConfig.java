@@ -26,6 +26,7 @@ public class ContasBancariasWriterConfig implements ItemWriter<Conta>{
 		return writer;
 	}
 	
+	@SuppressWarnings("null")
 	@Override
 	public void write(Chunk<? extends Conta> chunk) throws Exception {
 		contasBancariasWriter().write(chunk);

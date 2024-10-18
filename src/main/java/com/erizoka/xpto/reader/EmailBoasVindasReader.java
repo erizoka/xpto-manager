@@ -33,7 +33,8 @@ public class EmailBoasVindasReader {
     private RowMapper<NovaContaCliente> rowMapper() {
         return new RowMapper<NovaContaCliente>() {
 
-            @Override
+            @SuppressWarnings("null")
+			@Override
             public NovaContaCliente mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Cliente cliente = new Cliente();
                 cliente.setEmail(rs.getString("email"));
