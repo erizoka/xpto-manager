@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.erizoka.xpto.data.vo.ClienteVO;
 import com.erizoka.xpto.data.vo.ContaVO;
 import com.erizoka.xpto.enuns.TipoConta;
 import com.erizoka.xpto.exception.NoValidAccountTypeException;
@@ -37,6 +38,11 @@ public class ContaController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
+	@GetMapping("/cliente/{clienteId}")
+	public ResponseEntity<ContaVO> findByClienteId(@PathVariable String clienteId){
+		return ResponseEntity.ok(service.findByClienteId(clienteId));
+	}
+	
 	@GetMapping("/tipo/{tipo}")
 	public ResponseEntity<List<ContaVO>> findByTipoConta(@PathVariable String tipo) throws NoValidAccountTypeException{
 		try {
@@ -50,8 +56,8 @@ public class ContaController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteById(@PathVariable String clienteId){
-		service.deleteByClienteId(clienteId);
+	public ResponseEntity<?> deleteByCliente(@RequestBody ClienteVO cliente){
+		service.deleteByCliente(cliente);
 		return ResponseEntity.noContent().build();
 	}
 

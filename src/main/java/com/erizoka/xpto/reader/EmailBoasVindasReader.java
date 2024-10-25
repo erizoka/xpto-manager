@@ -43,11 +43,12 @@ public class EmailBoasVindasReader {
                 cliente.setFaixaSalarial(rs.getDouble("faixa_salarial"));
                 
                 Conta conta = new Conta();
-                conta.setClienteId(cliente.getEmail());
-                conta.setFaixaSalarial(cliente.getFaixaSalarial());
                 conta.setId(rs.getInt("id"));
                 conta.setLimite(rs.getDouble("limite"));
                 conta.setTipo(TipoConta.valueOf(rs.getString("tipo")));
+                
+                conta.setCliente(cliente);
+                cliente.setConta(conta);
 
                 NovaContaCliente novaContaCliente = new NovaContaCliente();
                 novaContaCliente.setCliente(cliente);

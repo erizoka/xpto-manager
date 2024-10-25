@@ -15,9 +15,10 @@ public class ContasBancariasProcessor implements ItemProcessor<Cliente, Conta>{
 		
 		Conta conta = new Conta();
 		
-		conta.setClienteId(cliente.getEmail());
-		conta.setFaixaSalarial(cliente.getFaixaSalarial());
+		conta.setCliente(cliente);
 		conta.definirTipoELimitePorFaixaSalarial();
+		
+		cliente.setConta(conta);
 		
 		return conta;
 	}

@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.erizoka.xpto.data.vo.ClienteVO;
 import com.erizoka.xpto.data.vo.ContaVO;
+import com.erizoka.xpto.entity.Cliente;
 import com.erizoka.xpto.entity.Conta;
 import com.erizoka.xpto.enuns.TipoConta;
 import com.erizoka.xpto.exception.RequiredObjectIsNullException;
@@ -55,8 +57,8 @@ public class ContaService {
 		return DozerMapper.parseListObjects(repository.findByTipoConta(tipo), ContaVO.class);
 	}
 	
-	public void deleteByClienteId(String clienteId) {
-		repository.deleteByClienteId(clienteId);
+	public void deleteByCliente(ClienteVO clienteVo) {
+		repository.deleteByCliente(DozerMapper.parseObject(clienteVo, Cliente.class));
 	}
 	
 	public void update(ContaVO contaVO) {
@@ -64,8 +66,6 @@ public class ContaService {
 		Conta entity = repository.findById(contaVO.getId())
 			.orElseThrow(() -> new ResourceNotFoundException("Não há conta para o id: " + contaVO.getId()));
 
-		entity.setClienteId(contaVO.getClienteId());
-		entity.setFaixaSalarial(contaVO.getFaixaSalarial());
 		entity.setLimite(contaVO.getLimite());
 		entity.setTipo(contaVO.getTipo());
 

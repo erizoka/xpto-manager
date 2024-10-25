@@ -56,11 +56,13 @@ public class ClienteService {
 		if (clienteVO == null) throw new RequiredObjectIsNullException();
 		
 		var entity = DozerMapper.parseObject(clienteVO, Cliente.class);
-		var vo = DozerMapper.parseObject(repository.save(entity), ClienteVO.class);
-
+		
+		repository.save(entity);
 		iniciarJobNovaContaComEmail(entity);
+		
+		ClienteVO clienteAtualizado = findByEmail(entity.getEmail());
 
-		return vo;
+		return clienteAtualizado;
 	}
 
 	public List<ClienteVO> findAll(){
@@ -83,8 +85,9 @@ public class ClienteService {
 	
 	@Transactional
 	public void deleteById(String email) {
+		ClienteVO cliente = findByEmail(email);
+		contaService.deleteByCliente(cliente);
 		repository.deleteById(email);
-		contaService.deleteByClienteId(email);
 	}
 	
 	@Transactional
@@ -100,8 +103,7 @@ public class ClienteService {
 		repository.save(clienteEntity);
 		
 		Conta contaEntity = DozerMapper.parseObject(contaService.findByClienteId(clienteEntity.getEmail()), Conta.class);
-		contaEntity.setFaixaSalarial(clienteEntity.getFaixaSalarial());
-    	contaEntity.definirTipoELimitePorFaixaSalarial();
+		contaEntity.definirTipoELimitePorFaixaSalarial();
 		
 		contaService.update(DozerMapper.parseObject(contaEntity, ContaVO.class));
 		

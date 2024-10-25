@@ -10,9 +10,7 @@ public class ContaVO {
 
 	private Double limite;
 	
-	private String clienteId;
-
-	private Double faixaSalarial;
+	private ClienteVO cliente;
 
 	public ContaVO() {}
 
@@ -40,19 +38,11 @@ public class ContaVO {
 		this.limite = limite;
 	}
 
-	public String getClienteId() {
-		return clienteId;
+	public ClienteVO getCliente() {
+		return cliente;
 	}
 
-	public void setClienteId(String clienteId) {
-		this.clienteId = clienteId;
-	}
-
-	public Double getFaixaSalarial() {
-		return faixaSalarial;
-	}
-
-	public void setFaixaSalarial(Double faixaSalarial) {
-		this.faixaSalarial = faixaSalarial;
+	public void setCliente(ClienteVO cliente) {
+		this.cliente = cliente;
 	}
 }

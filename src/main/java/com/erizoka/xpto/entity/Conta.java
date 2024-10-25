@@ -1,7 +1,6 @@
 package com.erizoka.xpto.entity;
 
 import com.erizoka.xpto.enuns.TipoConta;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,8 +9,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "conta")
@@ -28,24 +28,21 @@ public class Conta {
 	@Column(name = "limite")
 	private Double limite;
 	
-	@Column(name = "cliente_id")
-	private String clienteId;
-	
-	@Transient
-	@JsonIgnore
-	private Double faixaSalarial;
-
-	public Conta(Integer id, TipoConta tipo, Double limite, String clienteId) {
-		this.id = id;
-		this.tipo = tipo;
-		this.limite = limite;
-		this.clienteId = clienteId;
-	}
+	@OneToOne
+    @JoinColumn(name = "cliente_id", referencedColumnName = "email")
+    private Cliente cliente;
 
 	public Conta() {}
 	
+	public Conta(Integer id, TipoConta tipo, Double limite, Cliente cliente) {
+		this.id = id;
+		this.tipo = tipo;
+		this.limite = limite;
+		this.cliente = cliente;
+	}
+
 	public void definirTipoELimitePorFaixaSalarial() {
-        this.tipo = TipoConta.obterTipoPorFaixaSalarial(this.faixaSalarial);
+        this.tipo = TipoConta.obterTipoPorFaixaSalarial(this.cliente.getFaixaSalarial());
         this.limite = this.tipo.getLimite();
     }
 
@@ -73,19 +70,11 @@ public class Conta {
 		this.limite = limite;
 	}
 
-	public String getClienteId() {
-		return clienteId;
+	public Cliente getCliente() {
+		return cliente;
 	}
 
-	public void setClienteId(String clienteId) {
-		this.clienteId = clienteId;
-	}
-
-	public Double getFaixaSalarial() {
-		return faixaSalarial;
-	}
-
-	public void setFaixaSalarial(Double faixaSalarial) {
-		this.faixaSalarial = faixaSalarial;
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 }
