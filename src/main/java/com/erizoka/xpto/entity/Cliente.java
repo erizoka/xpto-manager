@@ -1,8 +1,11 @@
 package com.erizoka.xpto.entity;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.erizoka.xpto.enuns.Roles;
@@ -19,7 +22,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "cliente")
-public class Cliente implements UserDetails {
+public class Cliente implements UserDetails, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -123,12 +126,23 @@ public class Cliente implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return email;
+		return getEmail();
 	}
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
+		if (this.role == Roles.ADMIN) {
+			return List.of(
+				new SimpleGrantedAuthority("ROLE_ADMIN"),
+				new SimpleGrantedAuthority("ROLE_USER"),
+				new SimpleGrantedAuthority("ROLE_CLIENT")
+			);
+		} else if (this.role == Roles.USER) {
+			return List.of(
+					new SimpleGrantedAuthority("ROLE_USER"),
+					new SimpleGrantedAuthority("ROLE_CLIENT")
+			);
+		}
+		return List.of(new SimpleGrantedAuthority("ROLE_CLIENT"));
 	}
 }

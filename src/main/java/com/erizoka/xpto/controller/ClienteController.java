@@ -17,7 +17,7 @@ import com.erizoka.xpto.service.ClienteService;
 
 
 @RestController
-@RequestMapping("api/cliente/v1")
+@RequestMapping("/api/cliente/v1")
 public class ClienteController {
 
 	private final ClienteService service;

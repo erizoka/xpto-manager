@@ -3,7 +3,8 @@ package com.erizoka.xpto.enuns;
 public enum Roles {
 
 	ADMIN("admin"),
-    USER("user");
+    USER("user"),
+    CLIENT("client");
 
     private final String role;
 

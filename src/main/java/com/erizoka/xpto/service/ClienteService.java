@@ -8,6 +8,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.erizoka.xpto.data.vo.ClienteVO;
@@ -28,6 +29,9 @@ public class ClienteService {
 	@Autowired
 	ContaService contaService;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	private final ClienteRepository repository;
 	private JobLauncher jobLauncher;
 	private Job novaContaComEmailJob;
@@ -56,6 +60,9 @@ public class ClienteService {
 		if (clienteVO == null) throw new RequiredObjectIsNullException();
 		
 		var entity = DozerMapper.parseObject(clienteVO, Cliente.class);
+		
+		String encryptedPassword = passwordEncoder.encode(entity.getPassword());
+        entity.setSenha(encryptedPassword);
 		
 		repository.save(entity);
 		iniciarJobNovaContaComEmail(entity);

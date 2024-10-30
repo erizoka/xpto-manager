@@ -14,6 +14,5 @@ public class PropsConfig {
 		FileSystemResource resource = new FileSystemResource("C:/temp/data/xpto/application.properties");
 		configurer.setLocation(resource);
 		return configurer;
-
 	}
 }
