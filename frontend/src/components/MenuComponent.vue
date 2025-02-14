@@ -33,7 +33,7 @@ import { mapActions } from 'vuex';
 
 export default {
     methods: {
-        ...mapActions('store', ['logout']),
+        ...mapActions(['logout']),
 
         navigate(view) {
             this.$emit('navigate', view)

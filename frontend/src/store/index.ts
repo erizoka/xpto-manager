@@ -52,11 +52,15 @@ export default createStore({
     },
 
     logout({ commit }) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("contaUser");
       delete axios.defaults.headers.common["Authorization"];
+      localStorage.removeItem("token");
       commit("SET_TOKEN", null);
-      commit("SET_USER", { tipo: "", cliente: { nome: "" } });
+      localStorage.removeItem("contaUser");
+      commit("SET_USER", null);
+      localStorage.removeItem("totalPorTipo");
+      commit("SET_TOTAL_CONTAS", 0);
+      localStorage.removeItem("totalUsers");
+      commit("SET_TOTAL_USERS", 0);
     },
 
     async getUserDetails({ commit }, username) {

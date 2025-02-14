@@ -6,13 +6,15 @@
         </div>
         <div v-else>
             <div class="card-container">
-                <div v-for="user in users" :key="user.email" class="card" @click="getUserDetail(user.email)">
+                <div v-for="user in users" :key="user.email" class="card" @click="toggleUserDetail(user)">
                     <div class="card-title">
                         <span>{{ user.nome }}, {{ user.idade }}</span>
                         <span>{{ user.email }}</span>
                     </div>
-                    <div class="card-detail" v-if="isDetailOpen">
-                        <span>{{ userDetail.cliente }}</span>
+                    <div class="card-detail" v-if="user.isDetailOpen">
+                        <span>Tipo: {{ user.detail?.tipo }}</span>
+                        <span>Faixa Salarial: R${{ user.detail?.cliente.faixaSalarial }}</span>
+                        <span>Limite: {{ user.detail?.limite }}</span>
                     </div>
                 </div>
             </div>
@@ -23,8 +25,6 @@
 import api from '@/config/api';
 import { onMounted, ref } from 'vue';
 
-let userDetail = ref({});
-let isDetailOpen = false;
 const users = ref([]);
 const loading = ref(true);
 
@@ -32,7 +32,11 @@ async function getUsers() {
     try {
         const response = await api.get('/api/cliente/v1')
 
-        users.value = response.data
+        users.value = response.data.map(user => ({
+            ...user,
+            isDetailOpen: false,
+            detail: null,
+        }))
     } catch (error) {
         console.log(error)
     } finally {
@@ -40,16 +44,16 @@ async function getUsers() {
     }
 }
 
-async function getUserDetail(email) {
-    try {
-        const response = await api.get(`/api/conta/v1/cliente/${email}`)
-
-        userDetail.value = response.data
-        isDetailOpen = true
-
-    } catch (error) {
-        console.log(error)
+async function toggleUserDetail(user) {
+    if (!user.isDetailOpen) {
+        try {
+            const response = await api.get(`/api/conta/v1/cliente/${user.email}`)
+            user.detail = response.data
+        } catch (error) {
+            console.log(error)
+        }
     }
+    user.isDetailOpen = !user.isDetailOpen
 }
 
 onMounted(() => {
@@ -96,8 +100,15 @@ onMounted(() => {
     transition: ease 0.2s;
 }
 
-.card-title {
+.card-title,
+.card-detail {
     display: flex;
     justify-content: space-between;
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+.card-detail {
+    margin-top: 15px;
+    font-size: small;
 }
 </style>
