@@ -5,16 +5,26 @@
             <h3>Carregando...</h3>
         </div>
         <div v-else>
+            <div class="filter-container">
+                <label>Filtrar por Tipo Conta: </label>
+                <select v-model="selectedType">
+                    <option value="" selected>Todos</option>
+                    <option value="ouro">Ouro</option>
+                    <option value="prata">Prata</option>
+                    <option value="platina">Platina</option>
+                    <option value="diamante">Diamante</option>
+                </select>
+            </div>
             <div class="card-container">
-                <div v-for="user in users" :key="user.email" class="card" @click="toggleUserDetail(user)">
+                <div v-for="user in users" :key="user.id" class="card" @click="user.isDetailOpen = !user.isDetailOpen">
                     <div class="card-title">
-                        <span>{{ user.nome }}, {{ user.idade }}</span>
-                        <span>{{ user.email }}</span>
+                        <span>{{ user.cliente.nome }}, {{ user.cliente.idade }}</span>
+                        <span>{{ user.cliente.email }}</span>
                     </div>
                     <div class="card-detail" v-if="user.isDetailOpen">
-                        <span>Tipo: {{ user.detail?.tipo }}</span>
-                        <span>Faixa Salarial: R${{ user.detail?.cliente.faixaSalarial }}</span>
-                        <span>Limite: {{ user.detail?.limite }}</span>
+                        <span>Tipo: {{ user.tipo }}</span>
+                        <span>Faixa Salarial: R${{ user.cliente.faixaSalarial }}</span>
+                        <span>Limite: {{ user.limite }}</span>
                     </div>
                 </div>
             </div>
@@ -23,19 +33,19 @@
 </template>
 <script setup>
 import api from '@/config/api';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const users = ref([]);
 const loading = ref(true);
+const selectedType = ref("");
 
 async function getUsers() {
     try {
-        const response = await api.get('/api/cliente/v1')
+        const response = await api.get('/api/conta/v1')
 
         users.value = response.data.map(user => ({
             ...user,
-            isDetailOpen: false,
-            detail: null,
+            isDetailOpen: false
         }))
     } catch (error) {
         console.log(error)
@@ -44,17 +54,28 @@ async function getUsers() {
     }
 }
 
-async function toggleUserDetail(user) {
-    if (!user.isDetailOpen) {
-        try {
-            const response = await api.get(`/api/conta/v1/cliente/${user.email}`)
-            user.detail = response.data
-        } catch (error) {
-            console.log(error)
-        }
+async function fetchUsersByAccountType(tipo) {
+    if (!tipo || tipo === '') {
+        getUsers()
+        return
     }
-    user.isDetailOpen = !user.isDetailOpen
+
+    try {
+
+        const response = await api.get(`/api/conta/v1/tipo/${tipo}`)
+        users.value = response.data.map(user => ({
+            ...user,
+            isDetailOpen: false
+        }));
+
+    } catch (error) {
+        console.log(error)
+    }
 }
+
+watch(selectedType, (newType) => {
+    fetchUsersByAccountType(newType);
+})
 
 onMounted(() => {
     getUsers()
@@ -75,6 +96,21 @@ onMounted(() => {
     font-family: 'Trebuchet MS', sans-serif;
     font-weight: 300;
     font-style: oblique;
+}
+
+.filter-container {
+    width: 45%;
+    margin-left: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size: large;
+    font-weight: 800;
+}
+
+.filter-container select {
+    padding: 3px;
+    border-radius: 7px;
 }
 
 .card-container {

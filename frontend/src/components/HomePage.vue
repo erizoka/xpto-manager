@@ -31,22 +31,19 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['login', 'getUserDetails', 'getTotalUsers']),
+        ...mapActions(['login', 'getUserDetails']),
 
         async handleLogin() {
             try {
 
-                await this.login({ username: this.user.username, password: this.user.password })
+                const response = await this.login({ username: this.user.username, password: this.user.password })
 
                 await this.getUserDetails(this.user.username)
 
-                await this.getTotalUsers()
-
                 this.$router.push('/dashboard')
 
-
             } catch (error) {
-                notyf.error("Erro no login: " + error.code)
+                notyf.error(error.response?.data?.token)
             }
         }
     }

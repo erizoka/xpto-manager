@@ -40,7 +40,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getTotalPorTipoConta']),
+        ...mapActions(['fetchTotalPorTipoConta', 'fetchTotalUsers']),
         handleNavigation(view) {
             this.view = view;
         },
@@ -58,7 +58,8 @@ export default {
         }
     },
     async created() {
-        await this.getTotalPorTipoConta();
+        await this.fetchTotalPorTipoConta();
+        await this.fetchTotalUsers();
     }
 }
 </script>

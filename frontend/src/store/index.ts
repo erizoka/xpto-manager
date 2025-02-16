@@ -5,7 +5,7 @@ import axios from "axios";
 export default createStore({
   state: {
     token: "",
-    contaUser: JSON.parse(localStorage.getItem("contaUser") || "{}") || {
+    contaUser: JSON.parse(sessionStorage.getItem("contaUser") || "{}") || {
       tipo: "",
       cliente: {
         nome: "",
@@ -24,8 +24,8 @@ export default createStore({
     isAuthenticated: (state) => !!state.token,
     getContaUser: (state) => state.contaUser,
     getUserName: (state: {
-      totalPorTipoConta: any;
-      totalUsers: any;
+      totalPorTipoConta: object;
+      totalUsers: number;
       token: "";
       contaUser: { cliente: { nome: "" }; tipo: "" };
     }) => (state.contaUser ? state.contaUser.cliente.nome : null),
@@ -36,94 +36,75 @@ export default createStore({
 
   actions: {
     async login({ commit }, credentials) {
-      try {
-        const response = await api.post("/auth/login", credentials);
-        const token = response.data.token;
+      const response = await api.post("/auth/login", credentials);
+      const token = response.data.token;
 
-        localStorage.setItem("token", token);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        commit("SET_TOKEN", token);
+      commit("SET_TOKEN", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        return response.data;
-      } catch (error) {
-        console.error("Erro no login:", error);
-        throw error;
-      }
+      setTimeout(() => {
+        localStorage.removeItem("token");
+        window.location.reload();
+      }, 3600000);
+
+      return token;
     },
 
     logout({ commit }) {
       delete axios.defaults.headers.common["Authorization"];
       localStorage.removeItem("token");
+      sessionStorage.removeItem("contaUser");
       commit("SET_TOKEN", null);
-      localStorage.removeItem("contaUser");
       commit("SET_USER", null);
-      localStorage.removeItem("totalPorTipo");
       commit("SET_TOTAL_CONTAS", 0);
-      localStorage.removeItem("totalUsers");
       commit("SET_TOTAL_USERS", 0);
     },
 
     async getUserDetails({ commit }, username) {
-      try {
-        const contaCliente = await api.get(`/api/conta/v1/cliente/${username}`);
-        commit("SET_USER", contaCliente.data);
-      } catch (error) {
-        console.error("Erro ao obter usuário: ", error);
-        throw error;
-      }
+      const contaCliente = await api.get(`/api/conta/v1/cliente/${username}`);
+      commit("SET_USER", contaCliente.data);
     },
 
-    async getTotalUsers({ commit }) {
-      try {
-        const response = await api.get("/api/cliente/v1");
-        const todosUsuários = response.data;
+    async fetchTotalUsers({ commit }) {
+      const response = await api.get("/api/cliente/v1");
+      const todosUsuários = response.data;
 
-        commit("SET_TOTAL_USERS", todosUsuários.length);
-      } catch (error) {
-        console.error("Erro ao obter total de usuários: ", error);
-        throw error;
-      }
+      commit("SET_TOTAL_USERS", todosUsuários.length);
     },
 
-    async getTotalPorTipoConta({ commit }) {
+    async fetchTotalPorTipoConta({ commit }) {
       const tipos = ["ouro", "prata", "platina", "diamante"];
-      try {
-        const results = await Promise.all(
-          tipos.map(async (tipo) => {
-            const response = await api.get(`/api/conta/v1/tipo/${tipo}`);
-            return { tipo, total: response.data.length };
-          })
-        );
+      const results = await Promise.all(
+        tipos.map(async (tipo) => {
+          const response = await api.get(`/api/conta/v1/tipo/${tipo}`);
+          return { tipo, total: response.data.length };
+        })
+      );
 
-        // Monta o objeto com os totais
-        const totalContas = results.reduce((acc: any, item) => {
-          acc[item.tipo] = item.total;
-          return acc;
-        }, {});
+      // Monta o objeto com os totais
+      const totalContas = results.reduce((acc: any, item) => {
+        acc[item.tipo] = item.total;
+        return acc;
+      }, {});
 
-        commit("SET_TOTAL_CONTAS", totalContas);
-      } catch (error) {
-        console.error("Erro ao obter total de usuários: ", error);
-        throw error;
-      }
+      commit("SET_TOTAL_CONTAS", totalContas);
     },
   },
 
   mutations: {
     SET_TOKEN(state, token) {
       state.token = token;
+      localStorage.setItem("token", token);
     },
     SET_USER(state, contaUser) {
       state.contaUser = contaUser;
-      localStorage.setItem("contaUser", JSON.stringify(contaUser));
+      sessionStorage.setItem("contaUser", JSON.stringify(contaUser));
     },
     SET_TOTAL_USERS(state, totalUsers) {
       state.totalUsers = totalUsers;
-      localStorage.setItem("totalUsers", JSON.stringify(totalUsers));
     },
     SET_TOTAL_CONTAS(state, totalPorTipoConta) {
       state.totalPorTipoConta = totalPorTipoConta;
-      localStorage.setItem("totalPorTipo", totalPorTipoConta);
     },
   },
 });
