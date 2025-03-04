@@ -25,15 +25,19 @@
             </div>
         </div>
         <ListUsers v-else-if="view == 'users'" />
+        <EditarUser v-else-if="view == 'editar'" />
+        <CadastroPage v-else-if="view == 'cadastrar'" />
     </div>
 </template>
 
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
+import CadastroPage from './CadastroPage.vue';
+import EditarUser from './EditarUser.vue';
 import ListUsers from './ListUsers.vue';
 import MenuComponent from './MenuComponent.vue'
 export default {
-    components: { MenuComponent, ListUsers },
+    components: { MenuComponent, ListUsers, EditarUser, CadastroPage },
     data() {
         return {
             view: 'stats',

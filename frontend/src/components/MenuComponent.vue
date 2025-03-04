@@ -13,11 +13,11 @@
                 <i class="fa-regular fa-address-book" />
                 <span>Usuários</span>
             </button>
-            <button class="btn">
+            <button class="btn" @click="navigate('editar')">
                 <i class="fa-regular fa-pen-to-square" />
                 <span>Editar</span>
             </button>
-            <button class="btn" @click="this.$router.push(name = 'cadastrar-cliente')">
+            <button class="btn" @click="navigate('cadastrar')">
                 <i class="fa-solid fa-user-plus" />
                 <span>Cadastrar</span>
             </button>

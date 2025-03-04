@@ -1,7 +1,6 @@
 <template>
     <div class="cadastro-container">
-        <i class="fa-solid fa-reply" @click="this.$router.push('/dashboard')" />
-        <h1 class="title">Cadastrar Novo Cliente</h1>
+        <h2 class="title">Cadastrar Novo Cliente</h2>
         <form class="formulario">
             <span>Nome:</span>
             <input type="text" v-model="user.nome" required>
@@ -12,12 +11,12 @@
             <span>Idade:</span>
             <input type="number" v-model="user.idade" required>
             <span>Faixa Salarial:</span>
-            <input type="number" v-model="user.faixaSalarial" placeholder="R$" required>
+            <input type="text" v-model="user.faixaSalarial" placeholder="R$" required>
             <span>Tipo:</span>
             <select name="role" id="role" v-model="user.privilege" required>
-                <option value="USER">USER</option>
-                <option value="ADMIN">ADMIN</option>
                 <option value="CLIENT">CLIENTE</option>
+                <option value="USER">USUÁRIO</option>
+                <option value="ADMIN">ADMIN</option>
             </select>
             <div class="botoes">
                 <button @click="createUser">CADASTRAR</button>
@@ -62,27 +61,29 @@ export default {
 
 <style scoped>
 .cadastro-container {
+    height: 30rem;
     background-color: #FFF;
-    width: 35%;
-    padding: 10px 30px;
-    border-radius: 10px;
+    width: 90%;
+    padding: 30px 32px;
+    margin-right: 70px;
+    border-radius: 0 10px 20px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    position: relative;
-
+    align-items: start;
 }
 
 .title {
+    width: 100%;
     font-weight: bold;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.6rem;
+    font-style: italic;
     margin-bottom: 0;
     margin-top: 30px;
 }
 
 .formulario {
+    width: 90%;
     display: flex;
     flex-direction: column;
     padding: 10px;

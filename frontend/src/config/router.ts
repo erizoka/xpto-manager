@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomePage from "@/components/HomePage.vue";
 import CadastroPage from "@/components/CadastroPage.vue";
 import DashboardPage from "@/components/DashboardPage.vue";
+import EditarUser from "@/components/EditarUser.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,6 +22,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "dashboard",
     component: DashboardPage,
     meta: { title: "Visão Geral", requiresAuth: true },
+  },
+  {
+    path: "/editar-cliente",
+    name: "editar",
+    component: EditarUser,
+    meta: { title: "Editar Clietne", requiresAuth: true },
   },
 ];
 

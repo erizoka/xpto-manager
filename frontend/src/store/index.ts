@@ -36,24 +36,25 @@ export default createStore({
 
   actions: {
     async login({ commit }, credentials) {
+      localStorage.clear;
       const response = await api.post("/auth/login", credentials);
       const token = response.data.token;
 
       commit("SET_TOKEN", token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-      setTimeout(() => {
-        localStorage.removeItem("token");
-        window.location.reload();
-      }, 3600000);
+      // setTimeout(() => {
+      //   localStorage.removeItem("token");
+      //   window.location.reload();
+      // }, 3600000);
 
       return token;
     },
 
     logout({ commit }) {
-      delete axios.defaults.headers.common["Authorization"];
       localStorage.removeItem("token");
       sessionStorage.removeItem("contaUser");
+      axios.defaults.headers.common.Authorization = undefined;
       commit("SET_TOKEN", null);
       commit("SET_USER", null);
       commit("SET_TOTAL_CONTAS", 0);
