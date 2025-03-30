@@ -2,17 +2,20 @@ import { createStore } from "vuex";
 import api from "@/config/api";
 import axios from "axios";
 
+import * as VueCookies from "vue-cookies";
+const cookies: any = VueCookies;
+
 export default createStore({
   state: {
-    token: "",
-    contaUser: JSON.parse(sessionStorage.getItem("contaUser") || "{}") || {
+    token: cookies.get("token") || "",
+    contaUser: cookies.get("contaUser") || {
       tipo: "",
       cliente: {
         nome: "",
       },
     },
     totalUsers: 0,
-    totalPorTipoConta: {
+    totalByAccType: {
       prata: 0,
       ouro: 0,
       platina: 0,
@@ -21,91 +24,105 @@ export default createStore({
   },
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
     getContaUser: (state) => state.contaUser,
     getUserName: (state: {
-      totalPorTipoConta: object;
+      totalByAccType: object;
       totalUsers: number;
       token: "";
       contaUser: { cliente: { nome: "" }; tipo: "" };
     }) => (state.contaUser ? state.contaUser.cliente.nome : null),
     getUserType: (state) => (state.contaUser ? state.contaUser.tipo : null),
     getTotalUsers: (state) => (state.totalUsers ? state.totalUsers : 0),
-    getTotalTipoConta: (state) => state.totalPorTipoConta,
+    getTotalByAccType: (state) => state.totalByAccType,
+  },
+
+  mutations: {
+    SET_TOTAL_USERS(state, totalUsers) {
+      state.totalUsers = totalUsers;
+    },
+    SET_TOTAL_CONTAS(state, totalByAccType) {
+      state.totalByAccType = totalByAccType;
+    },
+    SET_TOKEN(state, token) {
+      state.token = token;
+      cookies.set("token", token, "2h");
+    },
+    SET_CONTA_USER(state, contaUser) {
+      state.contaUser = contaUser;
+      cookies.set("contaUser", contaUser, "2h");
+    },
+    logout(state) {
+      state.token = "";
+      state.contaUser = { tipo: "", cliente: { nome: "" } };
+      state.totalUsers = 0;
+      state.totalByAccType = {
+        prata: 0,
+        ouro: 0,
+        platina: 0,
+        diamante: 0,
+      };
+      cookies.remove("token");
+      cookies.remove("contaUser");
+      axios.defaults.headers.common.Authorization = undefined;
+    },
   },
 
   actions: {
     async login({ commit }, credentials) {
-      localStorage.clear;
-      const response = await api.post("/auth/login", credentials);
-      const token = response.data.token;
+      commit("logout");
+      try {
+        const response = await api.post("/auth/login", credentials);
+        const token = response.data.token;
 
-      commit("SET_TOKEN", token);
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+        commit("SET_TOKEN", token);
+        axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-      // setTimeout(() => {
-      //   localStorage.removeItem("token");
-      //   window.location.reload();
-      // }, 3600000);
-
-      return token;
-    },
-
-    logout({ commit }) {
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("contaUser");
-      axios.defaults.headers.common.Authorization = undefined;
-      commit("SET_TOKEN", null);
-      commit("SET_USER", null);
-      commit("SET_TOTAL_CONTAS", 0);
-      commit("SET_TOTAL_USERS", 0);
+        return token;
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async getUserDetails({ commit }, username) {
-      const contaCliente = await api.get(`/api/conta/v1/cliente/${username}`);
-      commit("SET_USER", contaCliente.data);
+      try {
+        const contaCliente = await api.get(`/api/conta/v1/cliente/${username}`);
+        commit("SET_CONTA_USER", contaCliente.data);
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async fetchTotalUsers({ commit }) {
-      const response = await api.get("/api/cliente/v1");
-      const todosUsuários = response.data;
+      try {
+        const response = await api.get("/api/cliente/v1");
+        const todosUsuários = response.data;
 
-      commit("SET_TOTAL_USERS", todosUsuários.length);
+        commit("SET_TOTAL_USERS", todosUsuários.length);
+      } catch (error) {
+        console.error(error);
+      }
     },
 
-    async fetchTotalPorTipoConta({ commit }) {
-      const tipos = ["ouro", "prata", "platina", "diamante"];
-      const results = await Promise.all(
-        tipos.map(async (tipo) => {
-          const response = await api.get(`/api/conta/v1/tipo/${tipo}`);
-          return { tipo, total: response.data.length };
-        })
-      );
+    async fetchtotalByAccType({ commit }) {
+      try {
+        const tipos = ["ouro", "prata", "platina", "diamante"];
+        const results = await Promise.all(
+          tipos.map(async (tipo) => {
+            const response = await api.get(`/api/conta/v1/tipo/${tipo}`);
+            return { tipo, total: response.data.length };
+          })
+        );
 
-      // Monta o objeto com os totais
-      const totalContas = results.reduce((acc: any, item) => {
-        acc[item.tipo] = item.total;
-        return acc;
-      }, {});
+        // Monta o objeto com os totais
+        const totalContas = results.reduce((acc: any, item) => {
+          acc[item.tipo] = item.total;
+          return acc;
+        }, {});
 
-      commit("SET_TOTAL_CONTAS", totalContas);
-    },
-  },
-
-  mutations: {
-    SET_TOKEN(state, token) {
-      state.token = token;
-      localStorage.setItem("token", token);
-    },
-    SET_USER(state, contaUser) {
-      state.contaUser = contaUser;
-      sessionStorage.setItem("contaUser", JSON.stringify(contaUser));
-    },
-    SET_TOTAL_USERS(state, totalUsers) {
-      state.totalUsers = totalUsers;
-    },
-    SET_TOTAL_CONTAS(state, totalPorTipoConta) {
-      state.totalPorTipoConta = totalPorTipoConta;
+        commit("SET_TOTAL_CONTAS", totalContas);
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 });

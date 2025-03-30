@@ -29,11 +29,11 @@
     </aside>
 </template>
 <script>
-import { mapActions } from 'vuex';
+import { mapMutations } from 'vuex';
 
 export default {
     methods: {
-        ...mapActions(['logout']),
+        ...mapMutations(['logout']),
 
         navigate(view) {
             this.$emit('navigate', view)

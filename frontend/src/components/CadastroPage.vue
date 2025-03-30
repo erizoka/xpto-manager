@@ -38,16 +38,17 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['getTotalPorTipoConta', 'getTotalUsers']),
+        ...mapActions(['fetchtotalByAccType', 'fetchTotalUsers']),
         clearForm() {
             this.user = {}
         },
         async createUser() {
             try {
 
+                // sem await devido job para envio de email
                 api.post('/api/cliente/v1', this.user)
-                await this.getTotalPorTipoConta
-                await this.getTotalUsers
+                await this.fetchtotalByAccType
+                await this.fetchTotalUsers
                 this.$router.push({ path: '/dashboard' })
 
             } catch (error) {

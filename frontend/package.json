@@ -15,6 +15,7 @@
     "frontend": "file:",
     "notyf": "^3.10.0",
     "vue": "^3.2.13",
+    "vue-cookies": "^1.8.6",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.2"
   },

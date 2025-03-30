@@ -1,8 +1,15 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+} from "vue-router";
 import HomePage from "@/components/HomePage.vue";
 import CadastroPage from "@/components/CadastroPage.vue";
 import DashboardPage from "@/components/DashboardPage.vue";
 import EditarUser from "@/components/EditarUser.vue";
+
+import * as VueCookies from "vue-cookies";
+const cookies: any = VueCookies;
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -37,7 +44,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem("token");
+  const isAuthenticated = cookies.isKey("token");
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     next({ path: "/" });

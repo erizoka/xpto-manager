@@ -36,6 +36,7 @@ import CadastroPage from './CadastroPage.vue';
 import EditarUser from './EditarUser.vue';
 import ListUsers from './ListUsers.vue';
 import MenuComponent from './MenuComponent.vue'
+
 export default {
     components: { MenuComponent, ListUsers, EditarUser, CadastroPage },
     data() {
@@ -44,25 +45,25 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['fetchTotalPorTipoConta', 'fetchTotalUsers']),
+        ...mapActions(['fetchtotalByAccType', 'fetchTotalUsers']),
         handleNavigation(view) {
             this.view = view;
         },
     },
     computed: {
         ...mapGetters(['getUserName', 'getUserType', 'getTotalUsers']),
-        ...mapState(['totalPorTipoConta']),
+        ...mapState(['totalByAccType']),
         tiposConta() {
             return [
-                { tipo: 'Diamante', total: this.totalPorTipoConta?.diamante || 0 },
-                { tipo: 'Platina', total: this.totalPorTipoConta?.platina || 0 },
-                { tipo: 'Ouro', total: this.totalPorTipoConta?.ouro || 0 },
-                { tipo: 'Prata', total: this.totalPorTipoConta?.prata || 0 },
+                { tipo: 'Diamante', total: this.totalByAccType?.diamante || 0 },
+                { tipo: 'Platina', total: this.totalByAccType?.platina || 0 },
+                { tipo: 'Ouro', total: this.totalByAccType?.ouro || 0 },
+                { tipo: 'Prata', total: this.totalByAccType?.prata || 0 },
             ]
         }
     },
     async created() {
-        await this.fetchTotalPorTipoConta();
+        await this.fetchtotalByAccType();
         await this.fetchTotalUsers();
     }
 }

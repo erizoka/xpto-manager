@@ -51,8 +51,12 @@
 
 <script setup>
 import api from '@/config/api';
+import { useStore } from 'vuex';
 import { notyf } from '@/config/notyf';
-import { ref } from 'vue'
+import { ref } from 'vue';
+import '../config/router';
+
+const store = useStore();
 
 const user = ref({})
 const hasUser = ref(false)
@@ -91,14 +95,16 @@ async function updateUser() {
 
 async function deleteUser(email) {
     try {
-
         const response = await api.delete(`/api/cliente/v1/${email}`)
+
         if (response) {
-            this.$router.push({ path: '/dashboard' })
+            await store.dispatch('fetchTotalUsers')
+            await store.dispatch('fetchtotalByAccType')
+            window.location.href = '/dashboard'
         }
 
     } catch (error) {
-        console.error("Erro ao excluir o usuário: ", error);
+        console.error("Erro ao excluir o usuário: ", error)
         notyf.error("Erro ao excluir o usuário!")
     }
 }

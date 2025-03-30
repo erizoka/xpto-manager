@@ -35,15 +35,19 @@ export default {
 
         async handleLogin() {
             try {
+                if (this.user.username === '' || this.user.password === '') {
+                    notyf.error('Email e senha precisam ser preenchidos!')
+                } else {
+                    const response = await this.login({ username: this.user.username, password: this.user.password })
 
-                const response = await this.login({ username: this.user.username, password: this.user.password })
-
-                await this.getUserDetails(this.user.username)
-
-                this.$router.push('/dashboard')
+                    if (response) {
+                        await this.getUserDetails(this.user.username)
+                        this.$router.push('/dashboard')
+                    }
+                }
 
             } catch (error) {
-                notyf.error(error.response?.data?.token)
+                notyf.error(error.response.data.token)
             }
         }
     }

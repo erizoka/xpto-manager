@@ -1,4 +1,6 @@
 import axios from "axios";
+import * as VueCookies from "vue-cookies";
+const cookies: any = VueCookies;
 
 const api = axios.create({
   baseURL: "http://localhost:3000",
@@ -9,9 +11,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = cookies.get("token");
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
