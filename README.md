@@ -26,7 +26,8 @@ npm install
 Backend:
 
 ```
-Instalação das dependências em Maven
+cd backend
+mvn install
 ```
 
 ## ☕ Usando XPTO Manager
